@@ -7,12 +7,13 @@ import com.huffmanzipper.commons.Node;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractCompressor {
-    public final void compress(byte[] fileData, OutputStream fout) throws IOException, ExecutionException, InterruptedException {
+    public final void compress(byte[] fileData, OutputStream fout) throws IOException, ExecutionException, InterruptedException, SQLException {
 
         Map<String ,Integer> freqMap=getFreqMap(fileData);
         IHuffmanCommons hc=new HuffmanCommonsImpl();
@@ -25,7 +26,7 @@ public abstract class AbstractCompressor {
         FileOperations.writeCompFile(fout,freqMap,compressedData,fileData.length);
     }
 
-    protected abstract Map<String ,Integer> getFreqMap(byte[] fileData) throws ExecutionException, InterruptedException;
+    protected abstract Map<String ,Integer> getFreqMap(byte[] fileData) throws ExecutionException, InterruptedException, SQLException;
     protected abstract byte[] compressedDataGeneration(byte[] fileData,Map<String, String> huffCodes);
 
 }

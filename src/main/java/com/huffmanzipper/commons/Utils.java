@@ -4,9 +4,38 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class Utils {
+    public static byte[] serializeMap(Map<String,Integer> freqMap)
+    {
+        byte[] arr=null;
+        try{
+            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            ObjectOutputStream oos=new ObjectOutputStream(baos);
+            oos.writeObject(freqMap);
+            oos.close();
+            arr= baos.toByteArray();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return arr;
+    }
+    public static String getChecksum(byte[] fileData)  {
+        byte[] mdigest;
+        try {
+            mdigest = MessageDigest.getInstance("MD5").digest(fileData);
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException(e);
+        }
+        String checksum=new BigInteger(1, mdigest).toString(16);
+        return checksum;
+    }
 
     public static long getFileSize(Map<String,Integer> freqMap,Map<String,String> huffCodes)
     {

@@ -1,8 +1,11 @@
 package com.huffmanzipper.wordcharbased.compression;
 
+import com.db.DBOperationsImpl;
+import com.db.IDBOperations;
 import com.huffmanzipper.AbstractCompressor;
 import com.huffmanzipper.commons.Utils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +83,16 @@ public class HuffmanWordPlusCharCompression extends AbstractCompressor {
         return uniqueWords;
     }
     @Override
-    protected Map<String, Integer> getFreqMap(byte[] fileData) throws ExecutionException, InterruptedException {
+    protected Map<String, Integer> getFreqMap(byte[] fileData) throws ExecutionException, InterruptedException, SQLException {
+        IDBOperations dbo=new DBOperationsImpl();
+        dbo.createNewTable();
+        String checksum=Utils.getChecksum(fileData);
+        Map<String,Integer> freqMap=dbo.readFromDB(checksum);
+        if(freqMap!=null)
+        {
+            return freqMap;
+        }
+
         List<String> words=convertByteArrayToListOfWords(fileData);
         Map<String,Integer> freqMapWords=getFreqMapWords(words);
         List<String > uniqueWords=getUniqueWordList(freqMapWords);
@@ -103,6 +115,10 @@ public class HuffmanWordPlusCharCompression extends AbstractCompressor {
             }
         }
         service.shutdownNow();
+
+        byte[] freqArr=Utils.serializeMap(bestMap);
+        dbo.insertIntoDB(checksum,freqArr);
+
         return bestMap;
     }
 

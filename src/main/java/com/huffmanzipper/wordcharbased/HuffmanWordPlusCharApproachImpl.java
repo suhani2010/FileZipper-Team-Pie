@@ -8,6 +8,7 @@ import com.huffmanzipper.wordcharbased.compression.HuffmanWordPlusCharCompressio
 import com.huffmanzipper.wordcharbased.decompression.HuffmanWordPlusCharDecompression;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -20,11 +21,13 @@ public class HuffmanWordPlusCharApproachImpl implements IZipperAlgorithm {
         this.huffmanDecompressor = new HuffmanWordPlusCharDecompression();
     }
     @Override
-    public void zip(String orgFile, String compFile) throws IOException, ExecutionException, InterruptedException {
+    public void zip(String orgFile, String compFile) throws IOException, ExecutionException, InterruptedException, SQLException {
         InputStream fin = new FileInputStream(orgFile);
         OutputStream fout = new FileOutputStream(compFile);
         byte[] fileData = FileOperations.readOrgFileData(fin);
         huffmanCompressor.compress(fileData,fout);
+        fin.close();
+        fout.close();
     }
 
     @Override
@@ -35,5 +38,7 @@ public class HuffmanWordPlusCharApproachImpl implements IZipperAlgorithm {
         Map<String, Integer> freqMap=FileOperations.readFreqMap(fin);
         byte[] fileData=FileOperations.readCompFileData(fin);
         huffmanDecompressor.decompress(fileData,freqMap,orgFileSize,fout);
+        fin.close();
+        fout.close();
     }
 }
